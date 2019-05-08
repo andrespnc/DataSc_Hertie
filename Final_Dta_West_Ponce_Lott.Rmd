@@ -8,7 +8,32 @@ output:
     number_sections: true  ## if you want number sections at each table header
     theme: united  # many options for theme, this one is my favorite.
 ---
+#Packages
+install.packages("WDI")
+library(WDI)
+install.packages("dplyr")
+library("dplyr")
+install.packages("plyr")
+library(plyr)
+install.packages("ggplot2")
+library(ggplot2)
 
+#Preparting the Data
+dat = WDI(indicator=c('NY.GDP.PCAP.KD', "SP.POP.TOTL", "MS.MIL.XPND.GD.ZS"), country='all', start=1960, end=2017)
+dat <- dat[complete.cases(dat),]
+dat2 <- dat
+dat2 <- dat2[!duplicated(dat2[,c("country")]),]
+country=c('MX','CA','US')
+
+ccodes <- c("V2","1A", "Z4", "4E", "T4", "XC", "Z7", "7E", "T7", "EU", "F1", "XE", "XD", "XF", "ZT", "XH", "XI", "XG", "LA", "V3", "ZJ", "XJ", "T2", "XL", "XO", "XM", "XN", "ZQ", "XQ", "T3", "XP", "XU", "OE", "S4", "S2", "V4", "V1", "S1", "8S", "T5", "ZG", "ZF", "XT", "1W")
+
+#create new dataframe
+milexp <- dat %>% filter(!iso2c %in% ccodes)
+
+#rename variables
+milexp <- rename(milexp, c("NY.GDP.PCAP.KD"="GDP", "SP.POP.TOTL"="Population","MS.MIL.XPND.GD.ZS"="Military Exp"))
+
+ 
 # Research Question
 
 # Variables
