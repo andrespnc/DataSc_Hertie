@@ -41,7 +41,7 @@ ccodes <- c("V2","1A", "4E", "T4", "XC", "7E", "T7", "EU", "F1", "XE", "XD", "XF
 milexp <- dat %>% filter(!iso2c %in% ccodes)
 
 #rename variables
-milexp <- rename(milexp, c("NY.GDP.PCAP.KD"="GDP", "SP.POP.TOTL"="Population","MS.MIL.XPND.GD.ZS"="Military.Exp"))
+milexp <- plyr::rename(milexp, c("NY.GDP.PCAP.KD"="GDP", "SP.POP.TOTL"="Population","MS.MIL.XPND.GD.ZS"="Military.Exp"))
 ```
 
 
