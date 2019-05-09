@@ -44,5 +44,32 @@ milexp <- rename(milexp, c("NY.GDP.PCAP.KD"="GDP", "SP.POP.TOTL"="Population","M
 
 # Method
 
+# Analysis
+# scatterplo, it's ugly need it fix it
+ggplot(milexp, aes(x=year, y=Military.Exp)) +
+  geom_point(size=1, shape=23)
 
+# analyzing regions
+milexp %>%
+  filter(iso2c == c('8S', 'ZG', 'Z4', "ZQ", "Z7", "ZJ", "XU")) %>%
+  ggplot() + geom_line(mapping = aes(year, Military.Exp, 
+                                     group=country, color=country)) +
+  labs(y = 'Military Expenditures (% of GDP)') +
+  ggtitle(paste('Regional Military Expenditure Comparison'))
+  
+# analyzing US, China, and India
+milexp %>%
+  filter(iso2c == c('US', 'IN', 'CN')) %>%
+  ggplot() + geom_line(mapping = aes(year, Military.Exp, 
+                                     group=country, color=country)) +
+  labs(y = 'Military Expenditures (% of GDP)') +
+  ggtitle(paste('Military Expenditure comparison of US, India and China'))
+
+
+# initial code for heatmap, this is ben's doing
+milexp <- milexp %>% mutate(`Raw expenditure`= GDP*Population*(`Military.Exp`/100)) %>% group_by(year) %>% 
+  dplyr::mutate(`Mean expenditure (%)`=mean(`Military.Exp`)) %>% 
+  dplyr::mutate(`Mean raw expenditure ($)`=mean(`Raw expenditure`)) %>% 
+  dplyr::mutate(`Mean raw difference`=`Raw expenditure`-`Mean raw expenditure ($)`) %>% 
+  dplyr::mutate('Mean pctg difference'=`Military.Exp`-`Mean expenditure (%)`)
 # New Line
