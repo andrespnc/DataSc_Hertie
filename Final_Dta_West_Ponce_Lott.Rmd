@@ -27,7 +27,7 @@ library(DT)
 
 ```{r}
 #Preparting the Data
-dat = WDI(indicator=c('NY.GDP.PCAP.KD', "SP.POP.TOTL", "MS.MIL.XPND.GD.ZS"), country='all', start=1960, end=2017)
+dat = WDI(indicator=c('NY.GDP.PCAP.KD', "SP.POP.TOTL", "MS.MIL.XPND.GD.ZS"), country='all', extra=TRUE, start=1960, end=2017)
 dat <- dat[complete.cases(dat),]
 dat2 <- dat
 dat2 <- dat2[!duplicated(dat2[,c("country")]),]
@@ -41,7 +41,10 @@ ccodes <- c("V2","1A", "4E", "T4", "XC", "7E", "T7", "EU", "F1", "XE", "XD", "XF
 milexp <- dat %>% filter(!iso2c %in% ccodes)
 
 #rename variables
-milexp <- plyr::rename(milexp, c("NY.GDP.PCAP.KD"="GDP", "SP.POP.TOTL"="Population","MS.MIL.XPND.GD.ZS"="Military.Exp"))
+milexp <- plyr::rename(milexp, c("NY.GDP.PCAP.KD"="GDP", "SP.POP.TOTL"="Population","MS.MIL.XPND.GD.ZS"= "Military.Exp"))
+
+unique(milexp$country)
+milexp$region<- 
 ```
 
 
@@ -75,13 +78,13 @@ p2<- plot_ly(milexp,
              x= ~GDP,
              y= ~Military.Exp,
              size= ~Population,
-             colors = "Set1",
+             color = ~region,
              frame= ~year,
              text= ~country,
              hoverinfo= "text",
              type = "scatter",
              mode= "markers",
-             showlegend = FALSE) %>% 
+             showlegend = TRUE) %>% 
   layout(title = "Military Expenditure by logged GDP",
          yaxis= list(title= "Military Expenditure"))
 
@@ -97,13 +100,13 @@ p1<- plot_ly(milexp,
              x= ~year,
              y= ~Military.Exp,
              size= ~GDP,
-             colors = "Set1",
+             color = ~region,
              frame= ~year,
              text= ~country,
              hoverinfo= "text",
              type = "scatter",
              mode= "markers",
-             showlegend = FALSE) %>% 
+             showlegend = TRUE) %>% 
   layout(title = "Military Expenditure by year",
          yaxis= list(title= "Military Expenditure"))
 p1
