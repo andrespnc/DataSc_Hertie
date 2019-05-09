@@ -17,6 +17,14 @@ install.packages("plyr")
 library(plyr)
 install.packages("ggplot2")
 library(ggplot2)
+install.packages("maptools")
+library(maptools)
+install.packages("rworldmap")
+library(rworldmap)
+install.packages("reshape")
+library(reshape)
+install.packages("knitr")
+library(knitr)
 
 #Preparting the Data
 dat = WDI(indicator=c('NY.GDP.PCAP.KD', "SP.POP.TOTL", "MS.MIL.XPND.GD.ZS"), country='all', start=1960, end=2017)
@@ -31,7 +39,7 @@ ccodes <- c("V2","1A", "4E", "T4", "XC", "7E", "T7", "EU", "F1", "XE", "XD", "XF
 milexp <- dat %>% filter(!iso2c %in% ccodes)
 
 #rename variables
-milexp <- rename(milexp, c("NY.GDP.PCAP.KD"="GDP", "SP.POP.TOTL"="Population","MS.MIL.XPND.GD.ZS"="Military Exp"))
+milexp <- rename(milexp, c(NY.GDP.PCAP.KD="GDP", SP.POP.TOTL="Population",MS.MIL.XPND.GD.ZS="Military Exp"))
 
  
 # Research Question
@@ -48,6 +56,22 @@ milexp <- rename(milexp, c("NY.GDP.PCAP.KD"="GDP", "SP.POP.TOTL"="Population","M
 # scatterplo, it's ugly need it fix it
 ggplot(milexp, aes(x=year, y=Military.Exp)) +
   geom_point(size=1, shape=23)
+  
+# world map
+milexp.recent <- milexp[milexp$year>2016,]
+milexp.recent <- subset(milexp, !( iso2c=="B8" | iso2c=='8S' | iso2c=='T6' | iso2c=='XU' | iso2c=='Z4' | iso2c=='Z7' | iso2c=='ZG' | iso2c=='ZJ' | iso2c=='ZQ') )
+milexpMap <- joinCountryData2Map(milexp.recent, 
+                               nameJoinColumn="country",
+                               joinCode="NAME")
+
+mapDevice('x11') #create a world shaped window
+
+#plot the map
+mapCountryData( milexpMap, 
+                nameColumnToPlot='Military.Exp', 
+                catMethod='fixedWidth', 
+                numCats=100, 
+                mapTitle = "2017 Military Expenditures (% of GDP)")
 
 # analyzing regions
 milexp %>%
@@ -72,4 +96,6 @@ milexp <- milexp %>% mutate(`Raw expenditure`= GDP*Population*(`Military.Exp`/10
   dplyr::mutate(`Mean raw expenditure ($)`=mean(`Raw expenditure`)) %>% 
   dplyr::mutate(`Mean raw difference`=`Raw expenditure`-`Mean raw expenditure ($)`) %>% 
   dplyr::mutate('Mean pctg difference'=`Military.Exp`-`Mean expenditure (%)`)
+  
+  
 # New Line
