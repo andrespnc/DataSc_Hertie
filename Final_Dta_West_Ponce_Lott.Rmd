@@ -25,7 +25,7 @@ dat2 <- dat
 dat2 <- dat2[!duplicated(dat2[,c("country")]),]
 country=c('MX','CA','US')
 
-ccodes <- c("V2","1A", "Z4", "4E", "T4", "XC", "Z7", "7E", "T7", "EU", "F1", "XE", "XD", "XF", "ZT", "XH", "XI", "XG", "LA", "V3", "ZJ", "XJ", "T2", "XL", "XO", "XM", "XN", "ZQ", "XQ", "T3", "XP", "XU", "OE", "S4", "S2", "V4", "V1", "S1", "8S", "T5", "ZG", "ZF", "XT", "1W")
+ccodes <- c("V2","1A", "4E", "T4", "XC", "7E", "T7", "EU", "F1", "XE", "XD", "XF", "ZT", "XH", "XI", "XG", "LA", "V3", "XJ", "T2", "XL", "XO", "XM", "XN", "XQ", "T3", "XP", "OE", "S4", "S2", "V4", "V1", "S1", "T5", "ZF", "XT", "1W")
 
 #create new dataframe
 milexp <- dat %>% filter(!iso2c %in% ccodes)
