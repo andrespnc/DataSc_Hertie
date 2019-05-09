@@ -8,24 +8,24 @@ output:
     number_sections: true  ## if you want number sections at each table header
     theme: united  # many options for theme, this one is my favorite.
 ---
-#Packages
-install.packages("WDI")
-library(WDI)
-install.packages("dplyr")
-library("dplyr")
-install.packages("plyr")
-library(plyr)
-install.packages("ggplot2")
-library(ggplot2)
-install.packages("maptools")
-library(maptools)
-install.packages("rworldmap")
-library(rworldmap)
-install.packages("reshape")
-library(reshape)
-install.packages("knitr")
-library(knitr)
 
+```{r include=FALSE}
+#install.packages("WDI")
+library(WDI)
+#install.packages("dplyr")
+library("dplyr")
+#install.packages("plyr")
+library(plyr)
+#install.packages("ggplot2")
+library(ggplot2)
+#install.packages("plotly")
+library(plotly)
+#install.packages("DT")
+library(DT)
+```
+
+
+```{r}
 #Preparting the Data
 dat = WDI(indicator=c('NY.GDP.PCAP.KD', "SP.POP.TOTL", "MS.MIL.XPND.GD.ZS"), country='all', start=1960, end=2017)
 dat <- dat[complete.cases(dat),]
@@ -34,12 +34,17 @@ dat2 <- dat2[!duplicated(dat2[,c("country")]),]
 country=c('MX','CA','US')
 
 ccodes <- c("V2","1A", "4E", "T4", "XC", "7E", "T7", "EU", "F1", "XE", "XD", "XF", "ZT", "XH", "XI", "XG", "LA", "V3", "XJ", "T2", "XL", "XO", "XM", "XN", "XQ", "T3", "XP", "OE", "S4", "S2", "V4", "V1", "S1", "T5", "ZF", "XT", "1W")
+```
 
+```{r}
 #create new dataframe
 milexp <- dat %>% filter(!iso2c %in% ccodes)
 
 #rename variables
-milexp <- rename(milexp, c(NY.GDP.PCAP.KD="GDP", SP.POP.TOTL="Population",MS.MIL.XPND.GD.ZS="Military Exp"))
+milexp <- rename(milexp, c("NY.GDP.PCAP.KD"="GDP", "SP.POP.TOTL"="Population","MS.MIL.XPND.GD.ZS"="Military.Exp"))
+```
+
+
 
  
 # Research Question
@@ -53,26 +58,60 @@ milexp <- rename(milexp, c(NY.GDP.PCAP.KD="GDP", SP.POP.TOTL="Population",MS.MIL
 # Method
 
 # Analysis
-# scatterplo, it's ugly need it fix it
-ggplot(milexp, aes(x=year, y=Military.Exp)) +
-  geom_point(size=1, shape=23)
-  
-# world map
-milexp.recent <- milexp[milexp$year>2016,]
-milexp.recent <- subset(milexp, !( iso2c=="B8" | iso2c=='8S' | iso2c=='T6' | iso2c=='XU' | iso2c=='Z4' | iso2c=='Z7' | iso2c=='ZG' | iso2c=='ZJ' | iso2c=='ZQ') )
-milexpMap <- joinCountryData2Map(milexp.recent, 
-                               nameJoinColumn="country",
-                               joinCode="NAME")
 
-mapDevice('x11') #create a world shaped window
 
-#plot the map
-mapCountryData( milexpMap, 
-                nameColumnToPlot='Military.Exp', 
-                catMethod='fixedWidth', 
-                numCats=100, 
-                mapTitle = "2017 Military Expenditures (% of GDP)")
+```{r}
 
+#Density map for Military Expenditure 1960-2010
+p<- milexp %>%  filter(year %in% c(1960, 1970, 1980, 2000, 2010)) %>% ggplot(aes(x= Military.Exp, group=as.factor(year), fill= as.factor(year))) + geom_density(alpha=0.4)+ labs(y= "proportion of countries", x= "Military Expenditure as % of GDP", fill= "Year")+ggtitle(paste("Military Expenditure comparison among countries"))
+
+p <- ggplotly(p)
+p
+```
+
+```{r Code Chunk, fig.width = 8, fig.height = 8}
+#We should add a regional component for colo
+p2<- plot_ly(milexp,
+             x= ~GDP,
+             y= ~Military.Exp,
+             size= ~Population,
+             colors = "Set1",
+             frame= ~year,
+             text= ~country,
+             hoverinfo= "text",
+             type = "scatter",
+             mode= "markers",
+             showlegend = FALSE) %>% 
+  layout(title = "Military Expenditure by logged GDP",
+         yaxis= list(title= "Military Expenditure"))
+
+p2 %>% layout(xaxis= list(type= "log"))
+
+
+
+```
+
+```{r}
+
+p1<- plot_ly(milexp,
+             x= ~year,
+             y= ~Military.Exp,
+             size= ~GDP,
+             colors = "Set1",
+             frame= ~year,
+             text= ~country,
+             hoverinfo= "text",
+             type = "scatter",
+             mode= "markers",
+             showlegend = FALSE) %>% 
+  layout(title = "Military Expenditure by year",
+         yaxis= list(title= "Military Expenditure"))
+p1
+
+```
+
+
+```{r}
 # analyzing regions
 milexp %>%
   filter(iso2c == c('8S', 'ZG', 'Z4', "ZQ", "Z7", "ZJ", "XU")) %>%
@@ -81,6 +120,9 @@ milexp %>%
   labs(y = 'Military Expenditures (% of GDP)') +
   ggtitle(paste('Regional Military Expenditure Comparison'))
   
+```
+
+```{r}
 # analyzing US, China, and India
 milexp %>%
   filter(iso2c == c('US', 'IN', 'CN')) %>%
@@ -88,14 +130,14 @@ milexp %>%
                                      group=country, color=country)) +
   labs(y = 'Military Expenditures (% of GDP)') +
   ggtitle(paste('Military Expenditure comparison of US, India and China'))
+```
 
 
+```{r}
 # initial code for heatmap, this is ben's doing
 milexp <- milexp %>% mutate(`Raw expenditure`= GDP*Population*(`Military.Exp`/100)) %>% group_by(year) %>% 
   dplyr::mutate(`Mean expenditure (%)`=mean(`Military.Exp`)) %>% 
   dplyr::mutate(`Mean raw expenditure ($)`=mean(`Raw expenditure`)) %>% 
   dplyr::mutate(`Mean raw difference`=`Raw expenditure`-`Mean raw expenditure ($)`) %>% 
   dplyr::mutate('Mean pctg difference'=`Military.Exp`-`Mean expenditure (%)`)
-  
-  
-# New Line
+```
