@@ -36,6 +36,14 @@ library(gganimate)
 library(gifski)
 #install.packages("png")
 library(png)
+#install.packages("magrittr")
+library (magrittr)
+#install.packages("mice")
+library (mice)
+#install.packages("VIM")
+library(VIM)
+#install.packages("factoextra")
+library (factoextra)
 ```
 
 
@@ -274,4 +282,18 @@ anim = staticplot + transition_states(year, transition_length = 4, state_length 
 
 animate(anim, 200, fps = 5,  width = 1200, height = 1000, 
         renderer = gifski_renderer("gganim2.gif"))
+```
+
+# Clustering countries 
+```{r}
+fviz_nbclust(milexp[,4:6], kmeans, method = "wss")
+```
+
+```{r}
+# I need to agregate values for better cluster interpretation
+k4 <- kmeans(milexp[,4:6], centers = 3, nstart = 25)
+
+#Plotting K-Means plot
+rownames(milexp)<- milexp[,2]
+fviz_cluster(k4, stand = T, ellipse.type= "convex", data = milexp[,4:6])
 ```
