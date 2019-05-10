@@ -64,7 +64,13 @@ milexp <- rename(milexp, c(NY.GDP.PCAP.KD="GDP", SP.POP.TOTL="Population",MS.MIL
 # Research Question
 
 # Variables
-
+```{r}
+as.datatable(formattable(milexp, 
+            align =c("l","c","c","c","c", "r"), 
+            list(`Indicator Name` = formatter(
+              "span", style = ~ style(color = "grey",font.weight = "bold")) 
+)))
+```
 
 # Hypothesis
 
