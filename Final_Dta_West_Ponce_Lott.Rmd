@@ -79,13 +79,12 @@ milexp.recent <- subset(milexp, !( iso2c=="B8" | iso2c=='8S' | iso2c=='T6' | iso
 milexpMap <- joinCountryData2Map(milexp.recent, 
                                nameJoinColumn="country",
                                joinCode="NAME")
-mapDevice('x11') #create a world shaped window
 #plot the map
 mapCountryData( milexpMap, 
                 nameColumnToPlot='Military.Exp', 
                 catMethod='fixedWidth', 
                 numCats=100,
-                mapTitle = "2017 Military.Expenditures (% of GDP)")
+                mapTitle = "2017 Military Expenditures (% of GDP)")
 ```
 
 ```{r}
