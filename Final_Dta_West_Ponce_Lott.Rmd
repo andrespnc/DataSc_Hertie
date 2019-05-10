@@ -207,9 +207,9 @@ movingdots <- ggplot(ordered, aes(country, `Raw expenditure`, color = factor(Sta
     y = "Military.Expenditure in USD"
   ) +
   transition_time(as.integer(year)) + #show the Year as integer
-  shadow_mark(alpha = 0.3, size = 0.5) +
+  shadow_mark(alpha = 0.9, size = 2) +
   ease_aes("linear")
-animate(movingdots, width= 1800, height=600)
+animate(movingdots, width= 1800, height=600, renderer = gifski_renderer("gganim1.gif"))
 
 ```
 
@@ -266,6 +266,6 @@ anim = staticplot + transition_states(year, transition_length = 4, state_length 
        subtitle  =  "Top 20 Countries",
        caption  = "Military.Expenditure per year | Data Source: World Bank Data")
 
-animate(anim, 200, fps = 10,  width = 1200, height = 1000, 
+animate(anim, 200, fps = 5,  width = 1200, height = 1000, 
         renderer = gifski_renderer("gganim2.gif"))
 ```
