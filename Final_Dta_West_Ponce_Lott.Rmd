@@ -22,6 +22,14 @@ library(ggplot2)
 library(plotly)
 #install.packages("DT")
 library(DT)
+install.packages("maptools")
+library(maptools)
+install.packages("rworldmap")
+library(rworldmap)
+install.packages("reshape")
+library(reshape)
+install.packages("knitr")
+library(knitr)
 ```
 
 
@@ -41,8 +49,7 @@ ccodes <- c("V2","1A", "4E", "T4", "XC", "7E", "T7", "EU", "F1", "XE", "XD", "XF
 milexp <- dat %>% filter(!iso2c %in% ccodes)
 
 #rename variables
-milexp <- plyr::rename(milexp, c("NY.GDP.PCAP.KD"="GDP", "SP.POP.TOTL"="Population","MS.MIL.XPND.GD.ZS"= "Military.Exp"))
-
+milexp <- rename(milexp, c(NY.GDP.PCAP.KD="GDP", SP.POP.TOTL="Population",MS.MIL.XPND.GD.ZS="Military Exp"))
 unique(milexp$country)
 milexp$region<- 
 ```
@@ -61,7 +68,21 @@ milexp$region<-
 # Method
 
 # Analysis
-
+```{r}
+#world map
+milexp.recent <- milexp[milexp$year>2016,]
+milexp.recent <- subset(milexp, !( iso2c=="B8" | iso2c=='8S' | iso2c=='T6' | iso2c=='XU' | iso2c=='Z4' | iso2c=='Z7' | iso2c=='ZG' | iso2c=='ZJ' | iso2c=='ZQ') )
+milexpMap <- joinCountryData2Map(milexp.recent, 
+                               nameJoinColumn="country",
+                               joinCode="NAME")
+mapDevice('x11') #create a world shaped window
+#plot the map
+mapCountryData( milexpMap, 
+                nameColumnToPlot='Military.Exp', 
+                catMethod='fixedWidth', 
+                numCats=100,
+                mapTitle = "2017 Military Expenditures (% of GDP)")
+```
 
 ```{r}
 
