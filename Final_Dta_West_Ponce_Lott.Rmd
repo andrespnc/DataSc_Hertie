@@ -44,6 +44,8 @@ library (mice)
 library(VIM)
 #install.packages("factoextra")
 library (factoextra)
+#install.packages("stats")
+library(stats)
 ```
 
 
@@ -283,22 +285,36 @@ anim = staticplot + transition_states(year, transition_length = 4, state_length 
 animate(anim, 200, fps = 5,  width = 1200, height = 1000, 
         renderer = gifski_renderer("gganim2.gif"))
 ```
-
 # Clustering countries 
 ```{r}
-ordered=ordered%>%group_by(country)%>%mutate(countrymean=mean(`Raw expenditure`)) %>% ungroup()
-```
-```{r}
+#Creating aggregated data
+new <- milexp %>% select(Military.Exp,Population,GDP,country) 
 
+agg = aggregate(new,
+                by = list(new$country),
+                FUN = mean)
+agg$country=NULL
+
+#taking out regions 
+agg<- agg[ -c(28,30,45,54,103,117,144), ]
+
+#creating rownames with country names
+agg <- agg %>% as.data.frame()
+rownames(agg) <- agg$Group.1
+agg <- agg[,-1]
+
+```
+
+### Clustering
 ```{r}
-fviz_nbclust(milexp[,4:6], kmeans, method = "wss")
+fviz_nbclust(agg, kmeans, method = "wss")
 ```
 
 ```{r}
 # I need to agregate values for better cluster interpretation
-k4 <- kmeans(milexp[,4:6], centers = 3, nstart = 25)
+agg=scale(agg, center = TRUE, scale = TRUE)
+k4 <- kmeans(agg, centers = 3, nstart = 25)
 
 #Plotting K-Means plot
-rownames(milexp)<- milexp[,2]
-fviz_cluster(k4, stand = T, ellipse.type= "convex", data = milexp[,4:6])
+fviz_cluster(k4, stand = T, ellipse.type= "convex", data = agg)
 ```
