@@ -286,6 +286,11 @@ animate(anim, 200, fps = 5,  width = 1200, height = 1000,
 
 # Clustering countries 
 ```{r}
+ordered=ordered%>%group_by(country)%>%mutate(countrymean=mean(`Raw expenditure`)) %>% ungroup()
+```
+```{r}
+
+```{r}
 fviz_nbclust(milexp[,4:6], kmeans, method = "wss")
 ```
 
