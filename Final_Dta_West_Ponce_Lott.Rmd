@@ -46,6 +46,8 @@ library(VIM)
 library (factoextra)
 #install.packages("stats")
 library(stats)
+#install.packages("crosstalk")
+library(crosstalk)
 ```
 
 
@@ -117,25 +119,13 @@ p
 ```
 
 ```{r Code Chunk, fig.width = 8, fig.height = 8}
-#We should add a regional component for colo
-p2<- plot_ly(milexp,
-             x= ~GDP,
-             y= ~Military.Exp,
-             size= ~Population,
-             color = ~region,
-             frame= ~year,
-             text= ~country,
-             hoverinfo= "text",
-             type = "scatter",
-             mode= "markers",
-             showlegend = TRUE) %>% 
-  layout(title = "Military Expenditure by logged GDP",
-         yaxis= list(title= "Military Expenditure"))
+#Plot map for  Military Expenditure - GDP over time 
+tx <- highlight_key(milexp, ~region)
+ggt<- ggplot(tx, aes(GDP, Military.Exp, color= region, frame=year))+
+geom_point(aes(size= Population, ids= country))
++ggtitle("Animation of Military Expenditure and GDP Over Time")
 
-p2 %>% layout(xaxis= list(type= "log"))
-
-
-
+highlight(ggplotly(ggt))
 ```
 
 ```{r}
@@ -154,6 +144,18 @@ p1<- plot_ly(milexp,
   layout(title = "Military Expenditure by year",
          yaxis= list(title= "Military Expenditure"))
 p1
+
+#Line plot for military expenditure over time for each country.
+g <- highlight_key(milexp, ~country)
+continent_filter <- filter_select("filter", "Select a country", g, ~country)
+
+p <- plot_ly(g, showlegend = F) %>%
+  group_by(country) %>%
+  add_lines(x = ~year, y = ~Military.Exp, color = ~country) %>%
+  layout(xaxis = list(title = "")) %>%
+  highlight(selected = attrs_selected(showlegend = F))
+
+bscols(continent_filter, p, widths = 12)
 
 ```
 
