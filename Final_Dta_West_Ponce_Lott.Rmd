@@ -72,8 +72,10 @@ milexp <- rename(milexp, c(NY.GDP.PCAP.KD="GDP", SP.POP.TOTL="Population",MS.MIL
 
  
 # Research Question
+This project looks to identify and present trends in global military spending over time. In presenting these trends in a highly visual way, the project attempts to make this information easily understandable and accessible to a wide range of audiences. Overall, the goal is to see where the most money is being spent and to what degree these expenditures are similar or different across geography and time.
 
 # Variables
+
 ```{r}
 as.datatable(formattable(milexp, 
             align =c("l","c","c","c","c", "r"), 
@@ -83,9 +85,10 @@ as.datatable(formattable(milexp,
 ```
 
 # Hypothesis
-
+Based on a background knowledge of the subject, the main hypothesis is that military expenditures by superpowers, and specifically the United States, far outstrip military expenditures of all other countries. Indeed, it may well be the case that the United States' military expenditures outpace those of the closest competitors combined. What will be interesting, then, will be to see how these change over time and to what degree we can see peaks or valleys in the expenditures during major events. In other words, a secondary hypothesis is that we should be able to correlate noticeable highs or lows with important world events.
 
 # Method
+The methods here are very simple. We do simple exploratory analysis of the variables at the country and regional level in order to identify any outstanding trends or notable deviations from norms. In the first instance, we will present a heat map of the world based on military expenditure over several decades to establish a sense of any patterns and trends that we may encounter with more detailed graphs and charts that will appear later. Then, we break down spending by country and by region and look for trends and patterns over the year. Finally, we will attempt a K-means cluster to see if machine learning techniques identify the same regions in the data that we do when we manually code them by our own definitions (i.e. Middle East and North Africa, North America, etc.)
 
 # Analysis
 ```{r}
@@ -195,9 +198,15 @@ milexp$`Raw expenditure lag` <- ifelse(milexp$country==lag(milexp$country)&milex
 ```
 
 ```{r}
-#Looking at heat graphs of deviance from mean based on relative and raw spending on military
-ordered <- milexp %>% group_by(year) %>% top_n(20, `Raw expenditure`) %>% ungroup()
+#Looking at dot graphs showing changes in top 20 spending over time
+ccodes <- c("B8","T6","V2","1A", "Z4", "4E", "T4", "XC", "Z7", "7E", 
+            "T7", "EU", "F1", "XE", "XD", "XF", "ZT", "XH", "XI", 
+            "XG", "LA", "V3", "ZJ", "XJ", "T2", "XL", "XO", "XM", 
+            "XN", "ZQ", "XQ", "T3", "XP", "XU", "OE", "S4", "S2", 
+            "V4", "V1", "S1", "8S", "T5", "ZG", "ZF", "XT", "1W")
 
+ordered <- milexp %>% filter(!iso2c %in% ccodes) %>% mutate(`Raw expenditure`=`Raw expenditure`/1000000) %>% 
+  group_by(year) %>% top_n(20, `Raw expenditure`) %>% ungroup()
 ordered$Status <- case_when(
   ordered$`Raw expenditure lag`>0 ~"Increased",
   ordered$`Raw expenditure lag`<0~"Decreased",
@@ -212,7 +221,7 @@ ordered <- ordered[complete.cases(ordered),]
 #Look at changes over the years in the top countries form 1960 till 2017
 cols <- c('Increased'="aquamarine", "Decreased"="light coral", "No change"="gray91")
 movingdots <- ggplot(ordered, aes(country, `Raw expenditure`, color = factor(Status))) +
-  geom_point(alpha = 0.7, size = 2) +
+  geom_point(alpha = 0.7, size = 10) +
   scale_color_manual(values = cols) +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 60, hjust = 1)) +
@@ -220,14 +229,19 @@ movingdots <- ggplot(ordered, aes(country, `Raw expenditure`, color = factor(Sta
   labs(
     title = "Year: {frame_time}",
     x = "Country", 
-    y = "Military Expenditure in USD"
+    y = "Military Expenditure in USD (billions)"
   ) +
   transition_time(as.integer(year)) + #show the Year as integer
-  shadow_mark(alpha = 0.9, size = 2) +
+  shadow_mark(alpha = 0.9, size = 5) +
   ease_aes("linear")
 animate(movingdots, width= 1800, height=600, renderer = gifski_renderer("gganim1.gif"))
-
 ```
+There are several interesting points to note here. First and foremost is the cear predominance of the United States in military spending over the years. There are no other contenders that even come close to the United States'. The caveat to this, of course, is that the graph does not include the USSR, only the Russian Federation. Therefore, we get a snapshot of Russia's post-Soviet collapse military spending which, while relatively unimposing at the start, increases steadily over time.
+The second is the spectacular rise of China. While it doesn't even appear on the chart until the early 1990s, it rapidy rises through the 2010s to become the second-highest military spending in over a decade. 
+That China so quickly achieves this is even more impressive given a third notable trend: overall, the military expenditures of different countries are relatively stable over time. Many of the perennial features on the list hardly move over the years and consist most often of grey dots indicating that they have not changed from one year to the next. Some countries, like Japan, feature a slow upwards creep.
+The fourth notable trend, then, is that, for the majority of countries, the predominant trend when there is movement seems to be upward. The military-industrial complex is strong and, for the most part, countries that are on the list stay there and only ever change military expenditure to increase it, in the grand scheme of things.
+This brings us to the final trend: large changes seem to be correlated with periods of conflict and strife, unsurprisingly. For example, US military spending increases rapidly and enormously in the years following the 9/11 attacks. Kuwait's only appearance on the map is during what appears to be the beginning of the Gulf War in the 1990s. Poland and Oman both appear on the list in more recent times. This can seemingly be explained by increasing regional tensions with Russia and Iran/Saudi Arabia (by way, possibly of Yemen), respectively, that might make them need to increase their military spending to secure themselves. Saudi Arabia, for its part, is relatively stable over time but begins increasingly rapidly in the 2010s, coinciding with the current conflict in Yemen.
+
 
 
 ```{r}
@@ -285,6 +299,7 @@ anim = staticplot + transition_states(year, transition_length = 4, state_length 
 animate(anim, 200, fps = 5,  width = 1200, height = 1000, 
         renderer = gifski_renderer("gganim2.gif"))
 ```
+This 
 # Clustering countries 
 ```{r}
 #Creating aggregated data
