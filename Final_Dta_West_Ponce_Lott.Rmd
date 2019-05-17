@@ -123,41 +123,27 @@ p
 #Plot map for  Military Expenditure - GDP over time 
 tx <- highlight_key(milexp, ~region)
 ggt<- ggplot(tx, aes(GDP, Military.Exp, color= region, frame=year))+
-geom_point(aes(size= Population, ids= country))
-+ggtitle("Animation of Military Expenditure and GDP Over Time")
+geom_point(aes(size= Population, ids= country))+ ggtitle("Animation of Military Expenditure and GDP Over Time")
+ggt<- ggplotly(ggt)
+ggt<- ggt %>% animation_opts(frame=1000, transition = 1000, easing = "elastic", redraw = FALSE) 
 
-highlight(ggplotly(ggt))
+highlight(ggt)
 ```
 
 ```{r}
 
-p1<- plot_ly(milexp,
-             x= ~year,
-             y= ~Military.Exp,
-             size= ~GDP,
-             color = ~region,
-             frame= ~year,
-             text= ~country,
-             hoverinfo= "text",
-             type = "scatter",
-             mode= "markers",
-             showlegend = TRUE) %>% 
-  layout(title = "Military Expenditure by year",
-         yaxis= list(title= "Military Expenditure"))
-p1
-
 #Line plot for military expenditure over time for each country.
 g <- highlight_key(milexp, ~country)
-continent_filter <- filter_select("filter", "Select a country", g, ~country)
+continent_filter <- bscols(filter_select("filter", "Select a country", g, ~country),
+                           filter_select("filter", "Select a Region", g, ~region))
 
 p <- plot_ly(g, showlegend = F) %>%
   group_by(country) %>%
   add_lines(x = ~year, y = ~Military.Exp, color = ~country) %>%
-  layout(xaxis = list(title = "")) %>%
+  layout(xaxis = list(title = ""), yaxis= list(title= "Military Expenditure as share of GDP"),title = "Military Expenditure by Country over time") %>%
   highlight(selected = attrs_selected(showlegend = F))
 
 bscols(continent_filter, p, widths = 12)
-
 ```
 
 
