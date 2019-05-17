@@ -108,6 +108,7 @@ mapCountryData( milexpMap,
                 numCats=100,
                 mapTitle = "2017 Military Expenditures (% of GDP)")
 ```
+We first visualized military expenditures on a global scale. What is most striking is that dominant global players, such as China, Russia, and the US do not spend the most on military expenditures as a percent of their GDP; rather, Angola, Eritrea, and Oman spend the most on military. This significant investment in the military is likely due to the fact that these are conflict-affected or prone states. The map also reveals how a country's level of military expenditures depends on its neighbors' military spending. For example, countries clustered together in the Middle East and in southern Africa appear to have similar levels of military expenditures. Finally, the graph highlights how countries that are more economically prosperous and industrialized, like the US and Russia, tend to spend more on their military. 
 
 ```{r}
 
@@ -180,7 +181,7 @@ milexp %>%
   labs(y = 'Military Expenditures (% of GDP)') +
   ggtitle(paste('Military Expenditure comparison of US, India and China'))
 ```
-
+We next compared military expenditures of China, India, and United States. In total, these countries have recently spent the most on military expenditures. We can see that the US spends the most on military expenditures as a percent of its GDP, but its expenditures do not remain constant over time. It was highest in the 1960s, but then decreased preciptiously around 1970. This makes sense given the mobilization of forces for the Vietnam War, and then the subsequent demobilization that occured mid 1970s. We then see a spike in military spending in the 1980s which occured under the Reagan administration and then decreased until it once again increased after 9/11. India's rate of military expenditure has has hovered around the same levels after it became a more industrialized country in the 1970s. In regards to China, we see that its military expenditures as a percent of its GDP have not risen significantly. Although China has assumed a more dominant global power, its military expenditure is still dwarfed by US's expendiure. However, as we will later explore, what is impressive is how quickly China became one of the world's biggest military spenders. Overall, the changes in military expenditures largely reflect economic growth and/or conflict. 
 
 ```{r}
 #Create a variable that is raw Military Expenditures and one that is the mean expenditure by percentage and by raw
